@@ -1,0 +1,87 @@
+#include <stdio.h>
+#include "array.h"
+
+#define INCORRECT_INPUT 1
+#define INCORRECT_INPUT_DATA 2
+#define FAILED_TO_ALLOCATE_MEMORY 8
+#define NOT_ENOUGH_DATA_AVAILABLE 3
+
+int main()
+{
+
+    struct array_t arr, odd, even;
+    int size, input = -1, i = 0, full = 0;
+
+    printf("Podaj rozmiar tablicy: ");
+    if (!scanf("%d", &size))
+        return printf("Incorrect input"), INCORRECT_INPUT;
+
+    if (size < 1)
+        return printf("Incorrect input data"), INCORRECT_INPUT_DATA;
+
+    if (!!array_create(&arr, size))
+        return printf("Failed to allocate memory"), FAILED_TO_ALLOCATE_MEMORY;
+
+
+    
+    printf("Podaj liczby: ");
+
+    while (1)
+    {
+
+        if (!scanf("%d", &input))
+        {
+            printf("Incorrect input");
+            array_destroy(&arr);
+            return INCORRECT_INPUT;
+        }
+
+        if (input == 0)
+            break;
+
+        if (array_push_back(&arr, input) == 2)
+            full = 1;
+
+        i++;
+    }
+
+    if (full)
+        printf("Failed to allocate memory\n");
+
+    if (arr.size == 0)
+    {
+        array_destroy(&arr);
+        printf("Not enough data available");
+        return NOT_ENOUGH_DATA_AVAILABLE;
+    }
+
+    int err;
+
+    err = array_separate(&arr, &odd, &even);
+
+    if (!err)
+    {
+        array_destroy(&arr);
+        printf("Failed to allocate memory");
+        return FAILED_TO_ALLOCATE_MEMORY;
+    }
+
+    if (err == 1 || err == 3)
+    {
+        array_display(&odd);
+        printf("\n");
+    }
+    else
+        printf("Buffer is empty\n");
+
+    if (err == 2 || err == 3)
+        array_display(&even);
+    else
+        printf("Buffer is empty\n");
+
+    array_destroy(&even);
+    array_destroy(&odd);
+    array_destroy(&arr);
+
+    return 0;
+}
